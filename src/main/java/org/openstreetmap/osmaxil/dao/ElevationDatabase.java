@@ -35,7 +35,7 @@ public class ElevationDatabase implements ElevationDataSource {
 	}
 
 	@Override
-	public ElevationImport findElevationByCoordinates(float x, float y, float valueScale, int srid) {
+	public ElevationImport findElevationByCoordinates(float x, float y, final float valueScale, int srid) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -45,7 +45,7 @@ public class ElevationDatabase implements ElevationDataSource {
 	 * That method use a radius as argument in order to skrink the including and excluding geometries.
 	 */
 	@Override
-	public List<ElevationImport> findAllElevationsByGeometry(String includingGeomAsWKT, String excludingGeomAsWKT, float valueScale, float shrinkRadius,
+	public List<ElevationImport> findAllElevationsByGeometry(String includingGeomAsWKT, String excludingGeomAsWKT, final float valueScale, float shrinkRadius,
 			int geomSrid) {
 		final String includingGeom = "ST_GeomFromText('" + includingGeomAsWKT + "', " + geomSrid + ")";
 		String query = "SELECT x, y, z FROM " + this.tableName;
@@ -88,7 +88,7 @@ public class ElevationDatabase implements ElevationDataSource {
 	/**
 	 * Find all points which intersect the including geometry and disjoint the excluding geometry (useful for multipolygon buildings with "hole").
 	 * That method use a factor as argument in order to scale the including and excluding geometries.
-	 * 
+	 *
 	 * TODO: use JTS instead of PostGis functions (ST_Scale and ST_Translate) to perform the scale/skrink process because this implementation is
 	 * working but it takes 15 minutes to execute !
 	 */
