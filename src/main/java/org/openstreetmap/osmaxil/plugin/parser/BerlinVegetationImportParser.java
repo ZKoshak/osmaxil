@@ -122,9 +122,9 @@ public class BerlinVegetationImportParser extends AbstractImportParser<Vegetatio
 					if (taxon_parse[1].equals("x") || taxon_parse[1].equals("×") || taxon_parse[1].equals("X")) {
 						result.setSpecies("×"+taxon_parse[2]);
 						if (word_count > 3) {
-							String Taxon = taxon_parse[0] + " " + "×"+taxon_parse[2];
-							for (int i = 3; i < word_count; i++) {Taxon = Taxon + " " + taxon_parse[i];}
-							result.setTaxon(Taxon);
+							String lTaxon = taxon_parse[0] + " " + "×"+taxon_parse[2];
+							for (int i = 3; i < word_count; i++) {lTaxon = lTaxon + " " + taxon_parse[i];}
+							result.setTaxon(lTaxon);
 						}
 					} else {
 						result.setTaxon(p.art_bot);
@@ -142,14 +142,17 @@ public class BerlinVegetationImportParser extends AbstractImportParser<Vegetatio
 		if (p.baumhoehe > 0) {
 			result.setHeight(p.baumhoehe);
 		}
+		if (p.stammumfg > 0) {
+			result.setCircumference((float)p.stammumfg);
+		}
 		if (p.kronedurch > 0) {
 			result.setCrown(p.kronedurch);
 		}
-		if (p.stammumfg > 0) {
-			result.setCircumference(p.stammumfg);
+		if (p.pflanzjahr != null) {
+			result.setPlantingYear(Integer.parseInt(p.pflanzjahr));
 		}
-		if (p.standalter != null) {
-			result.setPlantingYear(p.standalter);
+		if (p.standalter > 0) {
+			result.setTreeYears(p.standalter);
 		}
 		this.count++;
 		return result;

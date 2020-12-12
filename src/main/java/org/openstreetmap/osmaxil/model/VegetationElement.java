@@ -49,7 +49,13 @@ public class VegetationElement extends AbstractElement {
 	@Override
 	public String toString() {
 		return "OSM tree has id=[" + this.getOsmId() + "], coords=[" + this.getLongitude() + " " + this.getLatitude() + "] genus=["
-				+ this.getTagValue(ElementTag.GENUS) + "], species=[" + this.getTagValue(ElementTag.SPECIES) + "], name=[" + this.getName() + "]";
+				+ this.getTagValue(ElementTag.GENUS) + "], species=[" + this.getTagValue(ElementTag.SPECIES) + "], taxon=["
+				+ this.getTagValue(ElementTag.TAXON) + "], leaf_cycle=[" + this.getTagValue(ElementTag.LEAF_CYCLE) + "], leaf_type=["
+				+ this.getTagValue(ElementTag.LEAF_TYPE) + "], denotation=[" + this.getTagValue(ElementTag.DENOTATION) + "], planted_date=["
+				+ this.getTagValue(ElementTag.PLANTED_DATE) + "], tree:years=[" + this.getTagValue(ElementTag.TREE_YEARS) + "], height=["
+				+ this.getTagValue(ElementTag.HEIGHT) + "], circumference=[" + this.getTagValue(ElementTag.CIRCUMFERENCE) + "], diameter_crown=["
+				+ this.getTagValue(ElementTag.DIAMETER_CROWN) + "], source=[" + this.getTagValue(ElementTag.SOURCE) + "], fixme=["
+				+ this.getTagValue(ElementTag.FIXME) + "], name=[" + this.getName() + "]";
 	}
 
 }
