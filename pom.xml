@@ -55,7 +55,7 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
-			<scope>provided</scope>
+<!--			<scope>provided</scope> -->
 		</dependency>
 
 		<dependency>
@@ -85,23 +85,23 @@
 
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>gt-main</artifactId> 
-			<version>12-RC1</version> 
-		</dependency>
-		<dependency> 
-			<groupId>org.geotools</groupId> 
-			<artifactId>gt-referencing</artifactId> 
+			<artifactId>gt-main</artifactId>
 			<version>12-RC1</version>
-		</dependency> 
+		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
-			<artifactId>gt-epsg-hsql</artifactId> 
+			<artifactId>gt-referencing</artifactId>
+			<version>12-RC1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-epsg-hsql</artifactId>
 			<version>12-RC1</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.gdal</groupId>
-			<artifactId>gdal</artifactId> 
+			<artifactId>gdal</artifactId>
 			<version>2.2.0</version>
 		</dependency>
 
