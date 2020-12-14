@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.util.Date;
 
 import org.openstreetmap.osmaxil.dao.xml.osm.OsmXmlNode;
 import org.openstreetmap.osmaxil.dao.xml.osm.OsmXmlRoot;
@@ -17,11 +20,15 @@ import org.openstreetmap.osmaxil.model.VegetationImport;
 import org.openstreetmap.osmaxil.model.misc.MatchingElementId;
 import org.openstreetmap.osmaxil.plugin.matcher.VegetationImportMatcher;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component("VegetationMaker")
 @Lazy
 public class VegetationMakerFlow extends AbstractMakerFlow<VegetationElement, VegetationImport> {
+
+	@Value("${osmApi.changeset.source}")
+	private String changesetSourceLabel;
 
 	private List<OsmXmlRoot> newTreesToCreate = new ArrayList<>();
 
@@ -37,6 +44,9 @@ public class VegetationMakerFlow extends AbstractMakerFlow<VegetationElement, Ve
 
 	private int counterForMultiMatchingTrees;
 
+	private static final DateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+	private static final Date date = new Date();
+
 	// =========================================================================
 	// Overrided methods
 	// =========================================================================
@@ -49,7 +59,7 @@ public class VegetationMakerFlow extends AbstractMakerFlow<VegetationElement, Ve
 			this.nonMakableImportedTrees.add(imp);
 			return false;
 		}
-		// TODO Check if the imported tree is not on the sea 
+		// TODO Check if the imported tree is not on the sea
 		return true;
 	}
 
@@ -171,35 +181,168 @@ public class VegetationMakerFlow extends AbstractMakerFlow<VegetationElement, Ve
 		setCoordsAndFillTagValuesIfNotExists(tree, importedTree);
 		return tree;
 	}
-	
+
 	private void setCoordsAndFillTagValuesIfNotExists(VegetationElement treeElement, VegetationImport treeImport) {
 		// Set the coordinates
 		treeElement.setLatitude(treeImport.getLatitude());
 		treeElement.setLongitude(treeImport.getLongitude());
-		// Remove the source tag !
+//		// Remove the source tag !
+			// modifieng or add source tag
 		if (treeElement.getTagValue(ElementTag.SOURCE) != null) {
-			treeElement.removeTag(ElementTag.SOURCE);
+//			treeElement.removeTag(ElementTag.SOURCE);
+			treeElement.setTagValue(ElementTag.SOURCE, treeElement.getTagValue(ElementTag.SOURCE) + "(import:"+sdf.format(date)+") " + this.changesetSourceLabel);
+		} else {
+			treeElement.setTagValue(ElementTag.SOURCE, "(import:"+sdf.format(date)+") " + this.changesetSourceLabel);
 		}
-		// Set the tag values only if they don't exist yet
+//		// Set the tag values only if they don't exist yet
 		if (this.useReferenceCode) {
 			treeElement.setTagValue(ElementTag.REF + this.refCodeSuffix, treeImport.getReference());
 		}
-		if (treeElement.getTagValue(ElementTag.HEIGHT) == null && treeImport.getHeight() != null && treeImport.getHeight() > 0) {
-			treeElement.setTagValue(ElementTag.HEIGHT, treeImport.getHeight().toString());
-		}
-		if (isBlank(treeElement.getTagValue(ElementTag.SPECIES)) && isNotBlank(treeImport.getSpecies())) {
-			treeElement.setTagValue(ElementTag.SPECIES, treeImport.getSpecies());
-		}
-		// Don't set tag for genus if there is a already tag for species 
-		if (isBlank(treeElement.getTagValue(ElementTag.GENUS)) && isNotBlank(treeImport.getGenus())
-				&& isBlank(treeElement.getTagValue(ElementTag.SPECIES))) {
+		if (isNotBlank(treeImport.getGenus())) {
+			if (treeElement.getTagValue(ElementTag.GENUS) != null) {
+				treeElement.setTagValue("import:"+sdf.format(date)+":was:"+ElementTag.GENUS, treeElement.getTagValue(ElementTag.GENUS));
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение рода; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение рода");
+				}
+			}
 			treeElement.setTagValue(ElementTag.GENUS, treeImport.getGenus());
 		}
-		if (treeElement.getTagValue(ElementTag.CIRCUMFERENCE) == null && treeImport.getCircumference() != null && treeImport.getCircumference() > 0) {
+		if (isNotBlank(treeImport.getSpecies())) {
+			if (treeElement.getTagValue(ElementTag.SPECIES) != null) {
+				treeElement.setTagValue("import:"+sdf.format(date)+":was:"+ElementTag.SPECIES, treeElement.getTagValue(ElementTag.SPECIES));
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение вида; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение вида");
+				}
+			}
+			treeElement.setTagValue(ElementTag.SPECIES, treeImport.getSpecies());
+		}
+		if (isNotBlank(treeImport.getTaxon())) {
+			if (treeElement.getTagValue(ElementTag.TAXON) != null) {
+				treeElement.setTagValue("import:"+sdf.format(date)+":was:"+ElementTag.TAXON, treeElement.getTagValue(ElementTag.TAXON));
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение таксона; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение таксона");
+				}
+			}
+			treeElement.setTagValue(ElementTag.TAXON, treeImport.getTaxon());
+		}
+		if (isNotBlank(treeImport.getLeafType())) {
+			if (treeElement.getTagValue(ElementTag.LEAF_TYPE) != null) {
+				treeElement.setTagValue("import:"+sdf.format(date)+":was:"+ElementTag.LEAF_TYPE, treeElement.getTagValue(ElementTag.LEAF_TYPE));
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение типа листвы; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение типа листвы");
+				}
+			}
+			treeElement.setTagValue(ElementTag.LEAF_TYPE, treeImport.getLeafType());
+		}
+		if (isNotBlank(treeImport.getLeafCycle())) {
+			if (treeElement.getTagValue(ElementTag.LEAF_CYCLE) != null) {
+				treeElement.setTagValue("import:"+sdf.format(date)+":was:"+ElementTag.LEAF_CYCLE, treeElement.getTagValue(ElementTag.LEAF_CYCLE));
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение типа дерева; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение типа дерева");
+				}
+			}
+			treeElement.setTagValue(ElementTag.LEAF_CYCLE, treeImport.getLeafCycle());
+		}
+		if (treeElement.getTagValue(ElementTag.DENOTATION) != null) {
+			if ( !(treeElement.getTagValue(ElementTag.DENOTATION).equals("urban")) ) {
+				treeElement.setTagValue(treeElement.getTagValue(ElementTag.DENOTATION) + ";" + ElementTag.DENOTATION, "urban");
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение denotation; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение denotation");
+				}
+			}
+		} else {
+			treeElement.setTagValue(ElementTag.DENOTATION, "urban");
+		}
+//		// Don't set tag for genus if there is a already tag for species
+//		if (isBlank(treeElement.getTagValue(ElementTag.GENUS)) && isNotBlank(treeImport.getGenus())
+//				&& isBlank(treeElement.getTagValue(ElementTag.SPECIES))) {
+			//treeElement.setTagValue(ElementTag.GENUS, treeImport.getGenus());
+//		}
+		if (treeImport.getHeight() != null && treeImport.getHeight() > 0) {
+			if (treeElement.getTagValue(ElementTag.HEIGHT) != null) {
+				treeElement.setTagValue("import:"+sdf.format(date)+":was:"+ElementTag.HEIGHT, treeElement.getTagValue(ElementTag.HEIGHT));
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение высоты; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение высоты");
+				}
+			}
+			treeElement.setTagValue(ElementTag.HEIGHT, treeImport.getHeight().toString());
+		}
+		if (treeImport.getCircumference() != null && treeImport.getCircumference() > 0) {
+			if (treeElement.getTagValue(ElementTag.CIRCUMFERENCE) != null) {
+				treeElement.setTagValue("import:"+sdf.format(date)+":was:"+ElementTag.CIRCUMFERENCE, treeElement.getTagValue(ElementTag.CIRCUMFERENCE));
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение обxвата ствола; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение обxвата ствола");
+				}
+			}
 			treeElement.setTagValue(ElementTag.CIRCUMFERENCE, treeImport.getCircumference().toString());
 		}
-		if (treeElement.getTagValue(ElementTag.START_DATE) == null && treeImport.getPlantingYear() != null && treeImport.getPlantingYear() > 0) {
-			treeElement.setTagValue(ElementTag.START_DATE, treeImport.getPlantingYear().toString());
+		if (treeImport.getCrown() != null && treeImport.getCrown() > 0) {
+			if (treeElement.getTagValue(ElementTag.DIAMETER_CROWN) != null) {
+				treeElement.setTagValue("import:"+sdf.format(date)+":was:"+ElementTag.DIAMETER_CROWN, treeElement.getTagValue(ElementTag.DIAMETER_CROWN));
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение диаметра кроны; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение диаметра кроны");
+				}
+			}
+			treeElement.setTagValue(ElementTag.DIAMETER_CROWN, treeImport.getCrown().toString());
+		}
+		if (treeImport.getPlantingYear() != null && treeImport.getPlantingYear() > 0) {
+			if (treeElement.getTagValue(ElementTag.PLANTED_DATE) != null) {
+				treeElement.setTagValue("import:"+sdf.format(date)+":was:"+ElementTag.PLANTED_DATE, treeElement.getTagValue(ElementTag.PLANTED_DATE));
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение даты посадки; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение даты посадки");
+				}
+			}
+			treeElement.setTagValue(ElementTag.PLANTED_DATE, treeImport.getPlantingYear().toString());
+		}
+		if (treeImport.getTreeYears() != null && treeImport.getTreeYears() > 0) {
+			if (treeElement.getTagValue(ElementTag.TREE_YEARS) != null) {
+				treeElement.setTagValue("import:"+sdf.format(date)+":was:"+ElementTag.TREE_YEARS, treeElement.getTagValue(ElementTag.TREE_YEARS));
+				if (isNotBlank(treeImport.getFixme())) {
+					treeImport.setFixme("было изменено значение возраста дерева; " + treeImport.getFixme());
+				} else {
+					treeImport.setFixme("было изменено значение возраста дерева");
+				}
+			}
+			treeElement.setTagValue(ElementTag.TREE_YEARS, treeImport.getTreeYears().toString());
+		}
+		if (isNotBlank(treeImport.getFixme())) {
+			if (treeElement.getTagValue(ElementTag.FIXME) != null) {
+				treeElement.setTagValue(ElementTag.FIXME, "(import:"+sdf.format(date)+") need survey; " + treeImport.getFixme() + "; (ранее) " + treeElement.getTagValue(ElementTag.FIXME));
+			} else {
+				treeElement.setTagValue(ElementTag.FIXME, "(import:"+sdf.format(date)+") need survey; " + treeImport.getFixme());
+			}
+		} else {
+			if (treeElement.getTagValue(ElementTag.FIXME) != null) {
+				treeElement.setTagValue(ElementTag.FIXME, "(import:"+sdf.format(date)+") need survey; (ранее) " + treeElement.getTagValue(ElementTag.FIXME));
+			} else {
+				treeElement.setTagValue(ElementTag.FIXME, "(import:"+sdf.format(date)+") need survey");
+			}
+		}
+		treeElement.setTagValue("import", "yes");
+		if (treeElement.getTagValue("import:date") != null) {
+			treeElement.setTagValue("import:date", treeElement.getTagValue("import:date") + ";"+sdf.format(date));
+		} else {
+			treeElement.setTagValue("import:date", sdf.format(date));
 		}
 	}
 

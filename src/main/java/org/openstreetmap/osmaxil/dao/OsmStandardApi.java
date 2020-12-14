@@ -25,7 +25,7 @@ public class OsmStandardApi {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Value("${osmApi.url}")
-	private String url = "http://api06.dev.openstreetmap.org/api/0.6/";
+	private String url = "http://api.opm.zkoshak.linkpc.net/api/0.6/";
 
 	@Value("${osmApi.maxUpdatesByChangeset}")
 	private int MAX_UPDATES_BY_CHANGESET;

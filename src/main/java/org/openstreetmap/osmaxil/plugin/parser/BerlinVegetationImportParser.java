@@ -107,10 +107,10 @@ public class BerlinVegetationImportParser extends AbstractImportParser<Vegetatio
 			}
 			if (word_count == 1) {
 				lGenus = p.art_bot;
-				if (lFixme != null) {
-					lFixme = lFixme + "; определить вид";
-				} else {
+				if ( lFixme.equals("") ) {
 					lFixme = "определить вид";
+				} else {
+					lFixme = lFixme + "; определить вид";
 				}
 			} else {
 				taxon_parse = new String[word_count];
@@ -138,10 +138,10 @@ public class BerlinVegetationImportParser extends AbstractImportParser<Vegetatio
 						if (taxon_parse[1].charAt(0) != '\'' ) {
 							result.setSpecies(taxon_parse[1]);
 						} else {
-							if (lFixme != null) {
-								lFixme = lFixme + "; определить вид";
-							} else {
+							if ( lFixme.equals("") ) {
 								lFixme = "определить вид";
+							} else {
+								lFixme = lFixme + "; определить вид";
 							}
 						}
 					}
@@ -149,10 +149,10 @@ public class BerlinVegetationImportParser extends AbstractImportParser<Vegetatio
 					if (!(taxon_parse[1].equals("spec."))) {
 						result.setSpecies(taxon_parse[1]);
 					} else {
-						if (lFixme != null) {
-							lFixme = lFixme + "; определить вид";
-						} else {
+						if ( lFixme.equals("") ) {
 							lFixme = "определить вид";
+						} else {
+							lFixme = lFixme + "; определить вид";
 						}
 					}
 				}
@@ -254,10 +254,10 @@ public class BerlinVegetationImportParser extends AbstractImportParser<Vegetatio
 						result.setGenus(lGenus);
 						result.setLeafType("broadleaved");
 						result.setLeafCycle("deciduous");
-						if (lFixme != null) {
-							lFixme = lFixme + "; возможно куст";
-						} else {
+						if ( lFixme.equals("") ) {
 							lFixme = "возможно куст";
+						} else {
+							lFixme = lFixme + "; возможно куст";
 						}
 						break;
 				case "Larix":
@@ -272,28 +272,28 @@ public class BerlinVegetationImportParser extends AbstractImportParser<Vegetatio
 		if (p.baumhoehe > 0) {
 			result.setHeight(p.baumhoehe);
 		} else {
-			if (lFixme != null) {
-				lFixme = lFixme + "; измерить высоту";
-			} else {
+			if ( lFixme.equals("") ) {
 				lFixme = "измерить высоту";
+			} else {
+				lFixme = lFixme + "; измерить высоту";
 			}
 		}
 		if (p.stammumfg > 0) {
 			result.setCircumference((float)p.stammumfg);
 		} else {
-			if (lFixme != null) {
-				lFixme = lFixme + "; измерить обxват ствола";
-			} else {
+			if ( lFixme.equals("") ) {
 				lFixme = "измерить обxват ствола";
+			} else {
+				lFixme = lFixme + "; измерить обxват ствола";
 			}
 		}
 		if (p.kronedurch > 0) {
 			result.setCrown(p.kronedurch);
 		} else {
-			if (lFixme != null) {
-				lFixme = lFixme + "; измерить диаметр кроны";
-			} else {
+			if ( lFixme.equals("") ) {
 				lFixme = "измерить диаметр кроны";
+			} else {
+				lFixme = lFixme + "; измерить диаметр кроны";
 			}
 		}
 		if (p.pflanzjahr != null) {
@@ -302,7 +302,7 @@ public class BerlinVegetationImportParser extends AbstractImportParser<Vegetatio
 		if (p.standalter > 0) {
 			result.setTreeYears(p.standalter);
 		}
-		if (lFixme != null) {
+		if ( !(lFixme.equals("")) ) {
 			result.setFixme(lFixme);
 		}
 		this.count++;
