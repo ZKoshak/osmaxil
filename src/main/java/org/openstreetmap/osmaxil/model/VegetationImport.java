@@ -145,4 +145,12 @@ public class VegetationImport extends AbstractImport {
 	public void setDenotation(String denotation) {
 		this.denotation = denotation;
 	}
+
+	public String getFixme() {
+		return fixme;
+	}
+
+	public void setFixme(String fixme) {
+		this.fixme = fixme;
+	}
 }
